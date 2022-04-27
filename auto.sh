@@ -41,6 +41,19 @@ function file_creation() {
 
 	sed -i "65 r new_item_lines" website/categories/$item_category_name/pages/page1.html
 
+	#Format and rename images
+	cd image_manipulation
+	find . -iname "*.jpg" -o -iname "*.jpeg" | while read f; do
+        	name=$(echo "$f" | sed 's|./||')
+        	i=$((i+1))
+
+        	convert -resize 300x400 -gravity center -background "rgb(255,255,255)" -extent 400x400 $name item-$incremental_num-$i.jpg
+        	sleep 2
+		mv item-$incremental_num-$i.jpg ../website/categories/$item_category_name/items/
+	done
+	cd ..
+
+
 	 #BrowserCheck
 	sleep 3
 	firefox website/index.html
@@ -60,7 +73,7 @@ function file_deletion() {
 	read item_num
 	
 	 #Files deletion
-	rm -rf website/categories/$category_name/items/$item_num*
+	rm -rf website/categories/$category_name/items/item-$item_num*
 	
 	 #Deleting lines from page.html
 	 first_line_number=$(grep -nEA 12 "\--$item_num" website/categories/$category_name/pages/page1.html | grep -o -m1 -E '[[:digit:]]{2,3}:' | tr -d ':')
